@@ -1,16 +1,16 @@
 <?php
 	class SSDMDatabase
 	{
-		private static function write_db_error($error)
+		public static function clean_string($string)
 		{
-			$error_date = date('Y-m-d H:i:s');
-			$message = "{$error} | {$error_date} \r\n";
-			file_put_contents("db-log.txt", $message, FILE_APPEND);
+			$string = isset($string) ? trim($string) : '';
+			$string = isset($string) ? strip_tags($string) : '';
+			return $string;
 		}
 
 		private static function connect()
 		{
-			$mysqli = new mysqli(DB_SERVER, getenv('DB_USERNAME'), getenv('DB_PASSWORD'), DB_DATABASE);
+			$mysqli = new mysqli(getenv('DB_SERVER'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'));
 			if($mysqli->connect_errno != 0)
 			{
 				SSDMDatabase::write_db_error($mysqli->connect_error);
@@ -19,8 +19,21 @@
 			return $mysqli;
 		}
 
+		public static function write_db_error($error)
+		{
+			$error = SSDMDatabase::clean_string($error);
+			$error_date = date('Y-m-d H:i:s');
+			$message = "{$error} | {$error_date} \r\n";
+			file_put_contents(getenv('DB_LOG_FILE'), $message, FILE_APPEND);
+		}
+
 		public static function db_query($sql, $arg_string, $arg_array, $query_type)
 		{
+			$arg_string = SSDMDatabase::clean_string($arg_string);
+			foreach ($arg_array as $key => $value) 
+			{
+				$arg_array[$key] = SSDMDatabase::clean_string($value);
+			}
 			$mysqli = SSDMDatabase::connect();
 			if(!$mysqli)
 			{
@@ -49,17 +62,20 @@
 			$data = null;
 			switch($query_type)
 			{
-				case INSERT_QUERY_TYPE:
+				case QueryType::Insert:
 					$data['id'] = $stmt->insert_id;
 					break;
-				case SELECT_QUERY_TYPE:
+				case QueryType::Select:
 					$result = $stmt->get_result();
-					$data = mysqli_fetch_assoc($result);
+					if($result)
+					{
+						$data = mysqli_fetch_assoc($result);
+					}
 					break;
-				case DELETE_QUERY_TYPE:
+				case QueryType::Delete:
 					$data['delete'] = 1;
 					break;
-				case UPDATE_QUERY_TYPE:
+				case QueryType::Update:
 					$affected_rows = $stmt->affected_rows;
 					if($affected_rows > 0)
 					{
@@ -69,30 +85,6 @@
 			}
 			$mysqli->close();
 			return $data;
-		}
-
-		public static function record_exists($table, $index, $value)
-		{
-			$arg_string="";
-			if(is_string($value))
-			{
-				$arg_string = "s";
-			}
-			elseif(is_int($value))
-			{
-				$arg_string = "i";
-			}
-			else
-			{
-				return false;
-			}
-			$sql = "SELECT " . $index . " FROM " . $table . " WHERE " . $index . " = ?";
-			$data = SSDMDatabase::db_query($sql, $arg_string, [$value], SELECT_QUERY_TYPE);
-			if(!$data)
-			{
-				return false;
-			}
-			return true;
 		}
 	}
 ?>

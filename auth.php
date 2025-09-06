@@ -2,6 +2,7 @@
 	require_once("SSDMRegisterPlayer.php");
 	require_once("SSDMActivatePlayer.php");
 	require_once("SSDMLoginPlayer.php");
+	
 
 	header("Content-Type: application/json");
 
@@ -59,29 +60,38 @@
 	} 
 	else 
 	{
-		$player = new SSDMPlayer();
+		$player = new SSDMPlayer(null);
 		$player->error = "Invalid input method";
 		echo json_encode($player);
 		return;
 	}
 
+	$incoming_player->request_type = $request_type;
+	$incoming_player->user_name = $user_name;
+	$incoming_player->display_name = $display_name;
+	$incoming_player->email = $email;
+	$incoming_player->password = $password;
+	$incoming_player->client_id = $client_id;
+	$incoming_player->player_id = $player_id;
+	$incoming_player->session_ticker = $session_ticket;
+
 	/********************* 
 	 * End Test Code
 	 * *******************/
 
-	if($request_type == REGISTER_NEW_PLAYER_SESSION_TYPE)
+	if($request_type == SessionType::Register->value)
 	{
-		$player = new SSDMRegisterPlayer($user_name, $display_name, $email, $password, $client_id);
+		$player = new SSDMRegisterPlayer($incoming_player);
 		echo json_encode($player);
 	}
-	elseif($request_type == ACTIVATE_SESSION_TYPE)
+	elseif($request_type == SessionType::Activate->value)
 	{
-		$player = new SSDMActivatePlayer($client_id, $player_id, $session_ticket);
+		$player = new SSDMActivatePlayer($incoming_player);
 		echo json_encode($player);
 	}
-	elseif($request_type == LOGIN_SESSION_TYPE)
+	elseif($request_type == SessionType::Login->value)
 	{
-		$player = new SSDMLoginPlayer($user_name, $password, $client_id);
+		$player = new SSDMLoginPlayer($incoming_player);
 		echo json_encode($player);
 	}
 ?>
