@@ -9,15 +9,20 @@
 	define('MIN_PASSWORD_LENGTH', 8);
 	define('MAX_CLIENT_ID_LENGTH', 255);
 
-	define('MAX_REGISTER_TICKET_LENGTH', 16);
-	define('MAX_ACTIVATE_TICKET_LENGTH', 8);
-	define('MAX_LOGIN_TICKET_LENGTH', 16);
-	define('MAX_REMEMBER_ME_TICKET_LENGTH', 16);
+	define("ID_TICKET_LENGTH", 16);
+	define('REGISTER_TICKET_LENGTH', 6);
+	define('LOGIN_TICKET_LENGTH', 16);
+	define('REMEMBER_ME_TICKET_LENGTH', 16);
 
 
 	define('ACTIVATE_EXPIRATION_DATE', '+15 minutes');
 	define('REMEMBER_ME_EXPIRATION_DATE', '+1 month');
 	define('LOGIN_EXPIRATION_DATE', '+2 minutes');
+
+	define("REGISTER_SESSION", 1);
+	define("ACTIVATE_SESSION", 2);
+	define("LOGIN_SESSION", 3);
+	define("REMEMBER_ME_SESSION", 4);
 
 	enum QueryType
 	{
@@ -25,13 +30,5 @@
 		case Select;
 		case Delete;
 		case Update;
-	}
-
-	enum SessionType: string
-	{
-		case Register = "0";
-		case Activate = "1";
-		case Login = "2";
-		case Remember_me = "3";
 	}
 ?>

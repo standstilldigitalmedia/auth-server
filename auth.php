@@ -1,14 +1,12 @@
 <?php
-	require_once("SSDMRegisterPlayer.php");
-	require_once("SSDMActivatePlayer.php");
-	require_once("SSDMLoginPlayer.php");
+	require_once("SSDMPlayer.php");
 	
 
 	header("Content-Type: application/json");
 
 	//Examples to remind me once I am no longer testing in a browser
 	/*
-	$incoming_player = json_decode(file_get_contents('php://input'), false);
+	
 
 	if(!property_exists($incoming_player, 'request_type'))
 	{
@@ -27,7 +25,7 @@
 	 * It's just easier to see errors in my web browser using $_GET
 	 * ***************************/
 	
-	$request_type = -1;
+	/*$request_type = -1;
 	$user_name = "";
 	$display_name = "";
 	$email = "";
@@ -64,34 +62,30 @@
 		$player->error = "Invalid input method";
 		echo json_encode($player);
 		return;
-	}
+	}*/
 
-	$incoming_player->request_type = $request_type;
-	$incoming_player->user_name = $user_name;
-	$incoming_player->display_name = $display_name;
-	$incoming_player->email = $email;
-	$incoming_player->password = $password;
-	$incoming_player->client_id = $client_id;
-	$incoming_player->player_id = $player_id;
-	$incoming_player->session_ticker = $session_ticket;
+	/*$incoming_player = new stdClass();
+	if(isset($request_type))
+		$incoming_player->request_type = $request_type;
+	if(isset($user_name))
+		$incoming_player->user_name = $user_name;
+	if(isset($display_name))
+		$incoming_player->display_name = $display_name;
+	if(isset($email))
+		$incoming_player->email = $email;
+	if(isset($password))
+		$incoming_player->password = $password;
+	if(isset($client_id))
+		$incoming_player->client_id = $client_id;
+	if(isset($player_id))
+		$incoming_player->player_id = $player_id;
+	if(isset($session_ticket))
+		$incoming_player->session_ticket = $session_ticket;*/
 
 	/********************* 
 	 * End Test Code
 	 * *******************/
-
-	if($request_type == SessionType::Register->value)
-	{
-		$player = new SSDMRegisterPlayer($incoming_player);
-		echo json_encode($player);
-	}
-	elseif($request_type == SessionType::Activate->value)
-	{
-		$player = new SSDMActivatePlayer($incoming_player);
-		echo json_encode($player);
-	}
-	elseif($request_type == SessionType::Login->value)
-	{
-		$player = new SSDMLoginPlayer($incoming_player);
-		echo json_encode($player);
-	}
+	$incoming_player = json_decode(file_get_contents('php://input'), false);
+	$player = new SSDMPlayer($incoming_player);
+	echo json_encode($player);
 ?>

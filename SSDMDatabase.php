@@ -8,7 +8,38 @@
 			return $string;
 		}
 
-		private static function connect()
+		public static function generate_unique_id($strength, $length) 
+		{
+			if($length < 1)
+			{
+				SSDMDatabase::write_db_error("random string length less than 1");
+				return false;
+			}
+
+			$characters = "0123456789";
+			switch($strength)
+			{
+				case 0:
+					$characters = "0123456789";
+				case 1:
+					$characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+				case 2:
+					$characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+				case 3:
+					$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*-+?~';
+			}
+
+			$characters_length = strlen($characters);
+			$random_string = '';
+			$bytes = random_bytes($length);
+			for ($i = 0; $i < $length; $i++) 
+			{
+				$random_string .= $characters[ord($bytes[$i]) % $characters_length];
+			}
+			return $random_string;
+		}
+
+		public static function connect()
 		{
 			$mysqli = new mysqli(getenv('DB_SERVER'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'));
 			if($mysqli->connect_errno != 0)
